@@ -2,16 +2,10 @@ import streamlit as st
 import yfinance as yf
 import plotly.graph_objects as go
 import pandas as pd
-
 from streamlit_autorefresh import st_autorefresh
 
 # Auto-refresh every 60 seconds
 st_autorefresh(interval=60 * 1000, key="refresh")
-
-
-
-# Auto-refresh every 60 seconds
-st.experimental_autorefresh(interval=60 * 1000, key="refresh")
 
 st.title("📈 Multi‑Stock Portfolio Dashboard")
 
@@ -74,5 +68,3 @@ if portfolio_data:
 if symbols:
     fig.update_layout(title="Multi‑Stock Price History", xaxis_title="Date", yaxis_title="Price ($)")
     st.plotly_chart(fig)
-
-
