@@ -3,40 +3,51 @@ import yfinance as yf
 import plotly.graph_objects as go
 import pandas as pd
 
-st.title("📈 Stock Market Dashboard")
+st.title("📈 Multi‑Stock Portfolio Dashboard")
 
-# Stock input
-ticker = st.text_input("Enter Stock Symbol", "AAPL")
+# User enters multiple stock symbols separated by commas
+symbols = st.text_input("Enter Stock Symbols (comma separated)", "AAPL,MSFT,GOOGL")
+symbols = [s.strip().upper() for s in symbols.split(",") if s.strip()]
 
-# Fetch stock data
-stock = yf.Ticker(ticker)
-current_price = stock.history(period="1d")["Close"].iloc[-1]
-st.write(f"Current Price of {ticker}: ${current_price:.2f}")
+portfolio_data = []
 
-# Portfolio tracking inputs
-shares = st.number_input("Number of Shares", min_value=0, value=10)
-buy_price = st.number_input("Purchase Price ($)", min_value=0.0, value=250.0)
+for ticker in symbols:
+    stock = yf.Ticker(ticker)
+    current_price = stock.history(period="1d")["Close"].iloc[-1]
 
-# Portfolio calculations
-investment_cost = shares * buy_price
-current_value = shares * current_price
-profit_loss = current_value - investment_cost
+    st.subheader(f"{ticker} — Current Price: ${current_price:.2f}")
 
-st.write(f"Investment Cost: ${investment_cost:.2f}")
-st.write(f"Current Value: ${current_value:.2f}")
-st.write(f"Profit/Loss: ${profit_loss:.2f}")
+    # Portfolio tracking inputs for each stock
+    shares = st.number_input(f"Number of Shares for {ticker}", min_value=0, value=0, key=f"shares_{ticker}")
+    buy_price = st.number_input(f"Purchase Price ($) for {ticker}", min_value=0.0, value=0.0, key=f"buy_{ticker}")
 
-# Stock price history chart
-hist = stock.history(period="6mo")
-fig = go.Figure()
-fig.add_trace(go.Scatter(x=hist.index, y=hist["Close"], mode="lines", name="Price"))
-fig.update_layout(title=f"{ticker} Stock Price History", xaxis_title="Date", yaxis_title="Price ($)")
-st.plotly_chart(fig)
+    investment_cost = shares * buy_price
+    current_value = shares * current_price
+    profit_loss = current_value - investment_cost
 
-# Portfolio summary table
-data = {
-    "Metric": ["Investment Cost", "Current Value", "Profit/Loss"],
-    "Amount ($)": [investment_cost, current_value, profit_loss]
-}
-df = pd.DataFrame(data)
-st.table(df)
+    st.write(f"Investment Cost: ${investment_cost:.2f}")
+    st.write(f"Current Value: ${current_value:.2f}")
+    st.write(f"Profit/Loss: ${profit_loss:.2f}")
+
+    portfolio_data.append({
+        "Symbol": ticker,
+        "Shares": shares,
+        "Buy Price": buy_price,
+        "Investment Cost ($)": investment_cost,
+        "Current Value ($)": current_value,
+        "Profit/Loss ($)": profit_loss
+    })
+
+# Show portfolio summary table
+if portfolio_data:
+    df = pd.DataFrame(portfolio_data)
+    st.subheader("📊 Portfolio Summary")
+    st.table(df)
+
+# Optional: show combined chart for first stock
+if symbols:
+    hist = yf.Ticker(symbols[0]).history(period="6mo")
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(x=hist.index, y=hist["Close"], mode="lines", name=symbols[0]))
+    fig.update_layout(title=f"{symbols[0]} Stock Price History", xaxis_title="Date", yaxis_title="Price ($)")
+    st.plotly_chart(fig)
