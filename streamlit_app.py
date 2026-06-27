@@ -6,8 +6,6 @@ import pandas as pd
 # Auto-refresh every 60 seconds
 st.experimental_autorefresh(interval=60 * 1000, key="refresh")
 
-
-
 st.title("📈 Multi‑Stock Portfolio Dashboard")
 
 # User enters multiple stock symbols separated by commas
@@ -32,10 +30,18 @@ for ticker in symbols:
     investment_cost = shares * buy_price
     current_value = shares * current_price
     profit_loss = current_value - investment_cost
+    profit_percent = (profit_loss / investment_cost * 100) if investment_cost > 0 else 0
 
     st.write(f"Investment Cost: ${investment_cost:.2f}")
     st.write(f"Current Value: ${current_value:.2f}")
-    st.write(f"Profit/Loss: ${profit_loss:.2f}")
+
+    # Alerts with color coding
+    if profit_loss > 0:
+        st.success(f"Profit: ${profit_loss:.2f} (+{profit_percent:.2f}%) 🚀")
+    elif profit_loss < 0:
+        st.error(f"Loss: ${profit_loss:.2f} ({profit_percent:.2f}%) ⚠️")
+    else:
+        st.info("No Profit/Loss yet")
 
     portfolio_data.append({
         "Symbol": ticker,
@@ -43,7 +49,8 @@ for ticker in symbols:
         "Buy Price": buy_price,
         "Investment Cost ($)": investment_cost,
         "Current Value ($)": current_value,
-        "Profit/Loss ($)": profit_loss
+        "Profit/Loss ($)": profit_loss,
+        "Profit %": profit_percent
     })
 
     # Add each stock's history to the chart
@@ -60,4 +67,5 @@ if portfolio_data:
 if symbols:
     fig.update_layout(title="Multi‑Stock Price History", xaxis_title="Date", yaxis_title="Price ($)")
     st.plotly_chart(fig)
+
 
