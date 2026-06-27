@@ -3,6 +3,12 @@ import yfinance as yf
 import plotly.graph_objects as go
 import pandas as pd
 
+from streamlit_autorefresh import st_autorefresh
+
+# Auto-refresh every 60 seconds
+st_autorefresh(interval=60 * 1000, key="refresh")
+
+
 # Auto-refresh every 60 seconds
 st.experimental_autorefresh(interval=60 * 1000, key="refresh")
 
