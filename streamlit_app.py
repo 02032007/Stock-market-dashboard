@@ -10,3 +10,25 @@ profit_loss = current_value - investment_cost
 st.write(f"Investment Cost: ${investment_cost:.2f}")
 st.write(f"Current Value: ${current_value:.2f}")
 st.write(f"Profit/Loss: ${profit_loss:.2f}")
+
+stock = yf.Ticker(symbol)
+current_price = stock.history(period="1d")["Close"].iloc[-1]
+st.write(f"Current Price of {symbol}: ${current_price:.2f}")
+
+investment_cost = shares * buy_price
+current_value = shares * current_price
+profit_loss = current_value - investment_cost
+
+st.write(f"Investment Cost: ${investment_cost:.2f}")
+st.write(f"Current Value: ${current_value:.2f}")
+st.write(f"Profit/Loss: ${profit_loss:.2f}")
+
+import pandas as pd
+
+data = {
+    "Metric": ["Investment Cost", "Current Value", "Profit/Loss"],
+    "Amount ($)": [investment_cost, current_value, profit_loss]
+}
+df = pd.DataFrame(data)
+st.table(df)
+
