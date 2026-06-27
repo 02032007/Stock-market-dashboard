@@ -9,6 +9,7 @@ from streamlit_autorefresh import st_autorefresh
 st_autorefresh(interval=60 * 1000, key="refresh")
 
 
+
 # Auto-refresh every 60 seconds
 st.experimental_autorefresh(interval=60 * 1000, key="refresh")
 
