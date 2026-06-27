@@ -11,6 +11,9 @@ symbols = [s.strip().upper() for s in symbols.split(",") if s.strip()]
 
 portfolio_data = []
 
+# Multi-stock chart setup
+fig = go.Figure()
+
 for ticker in symbols:
     stock = yf.Ticker(ticker)
     current_price = stock.history(period="1d")["Close"].iloc[-1]
@@ -38,16 +41,18 @@ for ticker in symbols:
         "Profit/Loss ($)": profit_loss
     })
 
+    # Add each stock's history to the chart
+    hist = stock.history(period="6mo")
+    fig.add_trace(go.Scatter(x=hist.index, y=hist["Close"], mode="lines", name=ticker))
+
 # Show portfolio summary table
 if portfolio_data:
     df = pd.DataFrame(portfolio_data)
     st.subheader("📊 Portfolio Summary")
     st.table(df)
 
-# Optional: show combined chart for first stock
+# Show combined chart
 if symbols:
-    hist = yf.Ticker(symbols[0]).history(period="6mo")
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(x=hist.index, y=hist["Close"], mode="lines", name=symbols[0]))
-    fig.update_layout(title=f"{symbols[0]} Stock Price History", xaxis_title="Date", yaxis_title="Price ($)")
+    fig.update_layout(title="Multi‑Stock Price History", xaxis_title="Date", yaxis_title="Price ($)")
     st.plotly_chart(fig)
+
